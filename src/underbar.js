@@ -234,7 +234,7 @@
   _.defaults = function(obj) {
     _.each(arguments, function(srcObject){
       _.each(srcObject, function(value, key){
-        if (obj[key] === undefined){
+        if ( !(key in obj) ){
           obj[key] = value;
         }
       });
@@ -283,6 +283,15 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var storage = {};
+
+    return function(){
+      var key = Array.prototype.slice.call(arguments);
+      if (!storage[key]){
+        storage[key] = func.apply(this, arguments);
+      }
+      return storage[key];
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -292,6 +301,10 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments).slice(2);
+    setTimeout(function(){
+      return func.apply(this, args);
+    }, wait);
   };
 
 
